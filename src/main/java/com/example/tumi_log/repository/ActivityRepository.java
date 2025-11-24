@@ -7,4 +7,5 @@ import com.example.tumi_log.entity.Activity;
 
 @Repository
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
+
 }

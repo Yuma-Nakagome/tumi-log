@@ -1,6 +1,5 @@
 package com.example.tumi_log.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,8 +13,11 @@ import com.example.tumi_log.service.UserService;
 @Controller
 public class AuthController {
 
-    @Autowired
-    UserService userService;
+    public final UserService userService;
+
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/login")
     public String login() {
@@ -29,25 +31,28 @@ public class AuthController {
     }
 
     @GetMapping("/registerUser")
-    public String registerUser() {
+    public String registerUser(Model model) {
+        model.addAttribute("registrationUser", new UserRegistrationDto());
         return "registerUser";
     }
 
     @PostMapping("/registerUser")
     public String registerUser(@Validated UserRegistrationDto registrationUser, BindingResult result, Model model) {
-
+        System.out.println("POSTリクエストを受信しました。");
         if (result.hasErrors()) {
+            System.out.println("バリデーションエラーが発生しました。フォームに戻ります。");
             return "registerUser";
         }
-
+        System.out.println("バリデーションエラーはありませんでした。登録処理に進みます。");
         try {
             userService.registerUser(registrationUser);
         } catch (Exception e) {
+            System.out.println("登録処理中に例外が発生しました: " + e.getMessage());
             result.rejectValue("userName", "duplicate", "そのユーザー名は既に使用されています。");
             model.addAttribute("errorMessage", "そのユーザー名は既に使用されています。");
             return "registerUser";
         }
-
+        System.out.println("登録成功。ログイン画面にリダイレクトします。");
         return "redirect:/login";
 
     }

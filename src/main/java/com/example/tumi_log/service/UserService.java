@@ -21,7 +21,8 @@ public class UserService {
     }
 
     @Transactional
-    // ★ 修正後のシグネチャ: DTOを引数に取る
+    // 役割：メソッド内のDB操作を一連の作業として扱い、成功でコミット、失敗でロールバック（取り消し）する
+    // UserはUserエンティティのこと DTOを引数に取る
     public User registerUser(UserRegistrationDto registrationDto) {
 
         // 1. ビジネスロジック：ユーザー名が重複していないかチェック

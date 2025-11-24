@@ -15,8 +15,12 @@ public class WebSecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 return http
+
+                                .csrf(csrf -> csrf
+                                                .ignoringRequestMatchers("/api/**") // ★ APIパス全体でCSRF保護を無効化
+                                )
                                 .authorizeHttpRequests(authz -> authz
-                                                .requestMatchers("/registerUser", "/login")
+                                                .requestMatchers("/registerUser", "/login", "/api/**")
                                                 .permitAll()
                                                 .anyRequest().authenticated())
 
