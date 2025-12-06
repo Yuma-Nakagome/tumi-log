@@ -1,5 +1,7 @@
 package com.example.tumi_log.service;
 
+import java.util.stream.Collectors;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.tumi_log.dto.ActivityDto;
@@ -47,9 +49,10 @@ public class ActivityService {
         // 3. EntityからDTOへの変換（Controllerへの戻り値）
         ActivityDto createdActivityDto = new ActivityDto();
         createdActivityDto.setId(savedActivity.getId());
+        createdActivityDto.setUserId(savedActivity.getUser().getId());
         createdActivityDto.setTitle(savedActivity.getTitle());
         createdActivityDto.setDisplayStyle(savedActivity.getDisplayStyle());
-        createdActivityDto.setUserId(savedActivity.getUser().getId());
+
         return createdActivityDto; // DTOを返却
     }
     // 役割：メソッド内のDB操作を一連の作業として扱い、成功でコミット、失敗でロールバック（取り消し）する
@@ -67,9 +70,37 @@ public class ActivityService {
         // 3. EntityからDTOへの変換（Controllerへの戻り値）
         ActivityDto updatedActivityDto = new ActivityDto();
         updatedActivityDto.setId(savedActivity.getId());
+        updatedActivityDto.setUserId(savedActivity.getUser().getId());
         updatedActivityDto.setTitle(savedActivity.getTitle());
         updatedActivityDto.setDisplayStyle(savedActivity.getDisplayStyle());
-        updatedActivityDto.setUserId(savedActivity.getUser().getId());
+
         return updatedActivityDto; // DTOを返却
+    }
+
+    @Transactional
+    public List<ActivityDto> getActivitiesByUserId(Long userId) {
+        // 1. RepositoryからEntityのリストを取得 (ActivityDtoは使わず、userIdを直接渡す)
+        List<Activity> foundAllActivies = activityRepository.findByUserId(userId);
+        // 2. EntityのリストをDTOのリストに変換 (Stream APIを使用)
+        return foundAllActivies.stream()
+                // activity はリスト内の Activity エンティティ1つ1つ
+                .map(activity -> {
+                    // 2-1. 新しいDTOを作成
+                    ActivityDto dto = new ActivityDto();
+                    // 2-2. EntityからDTOへ値をコピー
+                    dto.setId(activity.getId());
+                    dto.setTitle(activity.getTitle());
+                    dto.setDisplayStyle(activity.getDisplayStyle());
+                    // UserエンティティからIDを取り出してセット
+                    dto.setUserId(activity.getUser().getId());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        // リストが空なら、空のList<ActivityDto>を返す
+    }
+
+    @Transactional
+    public void deletedActivity(Long id) {
+        activityRepository.deleteById(id);
     }
 }
