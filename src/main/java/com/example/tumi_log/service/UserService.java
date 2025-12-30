@@ -3,6 +3,7 @@ package com.example.tumi_log.service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.tumi_log.controller.DuplicateUserException;
 import com.example.tumi_log.dto.UserRegistrationDto;
 import com.example.tumi_log.entity.User;
 import com.example.tumi_log.repository.UserRepository;
@@ -27,7 +28,7 @@ public class UserService {
 
         // 1. ビジネスロジック：ユーザー名が重複していないかチェック
         if (userRepository.existsByUserName(registrationDto.getUserName())) {
-            throw new IllegalStateException("duplicate username");
+            throw new DuplicateUserException("ユーザー名" + registrationDto.getUserName() + "は既に使用されています。");
         }
 
         // 2. DTOからエンティティへの変換とパスワードのハッシュ化（最も重要な処理）

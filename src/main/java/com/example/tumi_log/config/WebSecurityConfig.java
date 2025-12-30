@@ -20,20 +20,24 @@ public class WebSecurityConfig {
                                                 .ignoringRequestMatchers("/api/**") // ★ APIパス全体でCSRF保護を無効化
                                 )
                                 .authorizeHttpRequests(authz -> authz
-                                                .requestMatchers("/registerUser", "/login", "/api/**")
+                                                // "/api/**" の制限よりも「前に」書くことで、ここだけ穴を開けて通します。
+                                                .requestMatchers("/api/auth/**", "/api/log").permitAll()
+                                                // authenticated() は、「認証が必要」という意味で、アクセスするURLを指定するものではありません。
+                                                // URLの指定は、その前の requestMatchers() で行います。
+                                                // まず API へのアクセス権限を先に定義する
+                                                .requestMatchers("/api/**").authenticated() // APIはログインが必須！
+
+                                                // index.html、JS、CSSはログイン不要でアクセス許可
+                                                // "/" (ルートパス)も許可しておくと、ドメイン直下のアクセスがしやすくなります
+                                                .requestMatchers("/", "/index.html", "/js/**", "/css/**",
+                                                                "/favicon.ico")
                                                 .permitAll()
-                                                .anyRequest().authenticated())
 
-                                .formLogin(form -> form
-                                                .loginPage("/login")
-                                                .failureUrl("/login?error")
-                                                .defaultSuccessUrl("/dashboard", true))
-
-                                .logout(logout -> logout
-                                                .logoutUrl("/logout") // ログアウト実行URL
-                                                .logoutSuccessUrl("/login?logout") // ★ 成功後、メッセージ付きでログイン画面へ戻る
-                                                .permitAll() // ログアウト処理は誰でも実行OK
-                                )
+                                                // 上記の2つで定義されなかった他の全てのURLは、permitAll()にする！
+                                                // これが非常に重要で、JSルーターに制御を渡すための設定です。
+                                                // 例: /editLog/123 のようなパスにアクセスがあっても、ログイン画面にはリダイレクトされず、
+                                                // JSが制御できる状態（index.htmlが表示された状態）を維持します。
+                                                .anyRequest().permitAll())
                                 .build();
         }
 
