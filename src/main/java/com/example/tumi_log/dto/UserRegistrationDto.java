@@ -5,6 +5,7 @@ import com.example.tumi_log.validation.annotation.PasswordMatches;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -12,6 +13,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @PasswordMatches
+@NoArgsConstructor
 public class UserRegistrationDto {
 
     private Long id;
