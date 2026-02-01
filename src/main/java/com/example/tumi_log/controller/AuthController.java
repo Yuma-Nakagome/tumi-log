@@ -1,64 +1,27 @@
 package com.example.tumi_log.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.tumi_log.service.CustomUserDetails;
+import com.example.tumi_log.dto.UserMeDto;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.example.tumi_log.dto.UserRegistrationDto;
-import com.example.tumi_log.service.UserService;
-
-@Controller
+@RestController
+@RequestMapping("/api/auth")
 public class AuthController {
-
-    @Autowired
-    UserService userService;
-
-    @GetMapping("/login")
-    public String login() {
-        return "login";
-    }
-
-    @GetMapping(value = "/login", params = "error")
-    public String loginFail(Model model) {
-        model.addAttribute("errorMessage", "ユーザー名またはパスワードが違います");
-        return "login";
-    }
-
-    @GetMapping("/registerUser")
-    public String registerUser() {
-        return "registerUser";
-    }
-
-    @PostMapping("/registerUser")
-    public String registerUser(@Validated UserRegistrationDto registrationUser, BindingResult result, Model model) {
-
-        if (result.hasErrors()) {
-            return "registerUser";
+    @PostMapping("/me")
+    public ResponseEntity<UserMeDto> me(@AuthenticationPrincipal CustomUserDetails principal) {
+        if (null == principal) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-        try {
-            userService.registerUser(registrationUser);
-        } catch (Exception e) {
-            result.rejectValue("userName", "duplicate", "そのユーザー名は既に使用されています。");
-            model.addAttribute("errorMessage", "そのユーザー名は既に使用されています。");
-            return "registerUser";
-        }
-
-        return "redirect:/login";
-
+        Long userId = principal.getId();
+        String username = principal.getUsername();
+        UserMeDto userMeDto = new UserMeDto(userId, username);
+        return ResponseEntity.status(HttpStatus.OK).body(userMeDto);
     }
-
-    // @GetMapping("/responseSample")
-    // public String responseSample(Model model) { // Modelを引数に追加
-    // // userオブジェクトが存在しない場合に備えて、null または空のオブジェクトを追加
-    // if (!model.containsAttribute("user")) {
-    // model.addAttribute("user", new UserRegistrationDto()); // nullチェック回避
-    // }
-    // return "responseSample";
-    // }
 
 }

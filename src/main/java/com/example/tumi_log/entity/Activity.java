@@ -16,7 +16,7 @@ public class Activity {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // IDの自動採番戦略を指定 (MySQLのAUTO_INCREMENTに対応)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) // Activity側: 複数（Many）のアクティビティが、User側: 一人（One）のユーザーに関連付けられる。
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

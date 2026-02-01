@@ -4,7 +4,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.userdetails.User;
+
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.example.tumi_log.repository.UserRepository;
 
 @Service
@@ -19,10 +24,17 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUserName(username)
-                .map(u -> User.withUsername(u.getUserName())
-                        .password(u.getPasswordHash()) // DBのハッシュを返す（例: $2a$...）
-                        .roles("USER")
-                        .build())
+                .map(user -> {
+                    // 権限のリスト（今回は "USER" ロールのみでOK）を作成
+                    List<GrantedAuthority> authorities = Collections
+                            .singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+                    return new CustomUserDetails(
+                            user.getId(), // ★ IDを渡す (新しい CustomUserDetails の引数に追加したもの)
+                            user.getUserName(), // ユーザー名
+                            user.getPasswordHash(), // DBのハッシュパスワード
+                            authorities // 権限リスト
+                    );
+                })
                 .orElseThrow(() -> new UsernameNotFoundException("User not found" + username));
     }
 }
