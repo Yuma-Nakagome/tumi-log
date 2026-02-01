@@ -15,4 +15,11 @@ public interface LogEntryRepository extends JpaRepository<LogEntry, Long> {
 
     List<LogEntry> findByLogDate(LocalDate logDate);
 
+    List<LogEntry> findByUserIdAndLogDate(Long userId, LocalDate logDate);
+
+    /**
+     * Spring Data JPAの命名規則による期間検索
+     * LogDate が startDate と endDate の間にある全てのレコードを取得
+     */
+    List<LogEntry> findByUserIdAndLogDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
 }

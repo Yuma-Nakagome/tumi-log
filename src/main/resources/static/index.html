@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TUMI-LOG - 活動記録アプリ</title>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+</head>
+
+<body>
+    <!-- 2. アプリケーションのメインコンテナ -->
+    <!-- JavaScriptがこの<div>の中に、ログイン画面や編集画面などを動的に生成します -->
+    <div id="app-root">
+        <!-- 最初のローディングメッセージなど -->
+        <p>アプリケーションを読み込み中...</p>
+    </div>
+
+    <!-- <div class="calendar_header">
+            <button id="prev_month_btn"></button>
+            <p id="year_month_label"></p>
+            <button id="next_month_btn"></button>
+        </div> -->
+    <!-- <main id="app-root">
+        JSがここに、カレンダーを表示したり設定画面を表示したりします -->
+    <!-- </main>
+    <div id="calendar_body"> -->
+    <!-- ここにJavaScriptでカレンダーが生成されます -->
+    <!-- </div> -->
+
+    <nav class="bottom-nav">
+        <a href="#home">ホーム</a>
+        <a href="#log">ログ</a>
+        <a href="#add" class="add-button">+</a> <!-- 真ん中に配置 -->
+        <a href="#stats">レポート</a>
+        <a href="#settings">設定</a>
+    </nav>
+    <!-- 3. JavaScriptファイルの読み込み -->
+    <!-- ここにアプリケーションの全てのロジックを記述したJSファイルを読み込みます -->
+    <!-- main.js は、API通信、DOM操作、ルーティング処理などを担当します -->
+    <script type="module" src="/js/main.js"></script>
+</body>
+
+</html>
