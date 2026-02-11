@@ -1,6 +1,63 @@
+import { getActivities, createLog } from '../api.js';
 
+export async function renderAdd(appRoot) {
+    // 1. ユーザーが登録した活動一覧を取得
+    const activities = await getActivities();
 
-export async function renderAdd() {
+    // 2. HTML構造をセット
+    appRoot.innerHTML = `
+        <div class="add-container">
+            <h2>どの活動をしましたか？</h2>
+            <p class="subtitle">タップして今日の記録を追加します</p>
+            <div id="activity-selection" class="activity-grid">
+                <!-- ここに活動ボタンが動的に追加されます -->
+            </div>
+            ${activities.length === 0 ? `
+                <div class="empty-state">
+                    <p>まだ活動の種類が登録されていません。</p>
+                    <a href="#log" class="btn-link">活動を登録しに行く</a>
+                </div>
+            ` : ''}
+        </div>
+    `;
 
-    return `<h1>追加</h1><p>データ件数:/p><p>活動数: </p>`;
+    const grid = document.getElementById('activity-selection');
+
+    // 3. 各活動のボタン（カード）を生成
+    activities.forEach(activity => {
+        const btn = document.createElement('button');
+        btn.className = 'activity-card';
+        btn.innerHTML = `
+            <div class="icon">${activity.displayStyle || '📝'}</div>
+            <div class="name">${activity.title}</div>
+        `;
+
+        // 4. ボタンクリック時の保存処理
+        btn.onclick = async () => {
+            // ローカル時刻で YYYY-MM-DD 形式を取得 (sv-SEロケールを使うと簡単です)
+            const today = new Date().toLocaleDateString('sv-SE'); 
+
+            // 二重送信防止
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+
+            try {
+                await createLog({
+                    activityId: activity.id,
+                    logDate: today,
+                    memo: "" // シンプルにするためメモは空。必要に応じて後で入力ダイアログ等を追加可能
+                });
+                
+                // 成功時はホーム（カレンダー）へ
+                window.location.hash = '#home';
+            } catch (error) {
+                console.error(error);
+                alert('記録の保存に失敗しました。');
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        };
+
+        grid.appendChild(btn);
+    });
 }

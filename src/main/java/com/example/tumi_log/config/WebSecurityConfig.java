@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -49,7 +50,14 @@ public class WebSecurityConfig {
                                                 // JSが制御できる状態（index.htmlが表示された状態）を維持します。
                                                 .anyRequest().permitAll())
 
+                                .exceptionHandling(customizer -> customizer
+                                                // 未認証のアクセスに対してはログインページへのリダイレクトではなく、401 Unauthorizedを返す
+                                                // これにより、API利用時やSPAで不要なHTMLページが返されるのを防ぐ
+                                                .authenticationEntryPoint(
+                                                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+
                                 .formLogin(form -> form
+                                                .loginPage("/login") // ダミーのログインページURLを指定してデフォルト画面生成を抑制
                                                 .loginProcessingUrl("/api/auth/login") // JSがPOSTするエンドポイント
                                                 .successHandler((request, response, authentication) -> {
                                                         response.setContentType("application/json;charset=UTF-8");

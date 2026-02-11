@@ -1,107 +1,96 @@
-// import { fetchLogs } from '../api.js';
-// import { getActivities } from './api.js';
+import { getActivities, fetchLogs } from '../api.js';
 
-export async function renderHome() {
-    // const logs = await fetchLogs(); // Javaからデータを取る
-    // const activities = await getActivities(); // Javaから活動データを取る
-    // return `<h1>ホーム</h1><p>データ件数: ${logs.length}</p><p>活動数: ${activities.length}</p>`;
-    return `<h1>home</h1><p>データ件数:/p><p>活動数: </p>`;
-}
+export async function renderHome(appRoot) {
+    // A. 実行した瞬間の「今日」の年月をセット
+    const now = new Date();
+    let currentYear = now.getFullYear();
+    let currentMonth = now.getMonth(); // 0-11
 
-
-
-
-const week = ["日", "月", "火", "水", "木", "金", "土"];
-
-const today = new Date(); // 今日の日付と時刻すべてを取得する。
-const todayYear = today.getFullYear();
-const todayMonth = today.getMonth() + 1;
-const todayDate = today.getDate();
-// ※ getDate()で「日」を取得できる。
-
-// 【変数】カレンダーで「今、表示している年と月」を管理するための変数（State）。
-// 「日」は「1日」で固定することで、月の増減（次月/前月ボタン）処理での
-// 月末日付の（31日がない月や2月）バグを防ぎ、カレンダーの開始曜日特定を容易にしている。
-let showdate = new Date(today.getFullYear(), today.getMonth(), 1);
-
-// この処理により、ブラウザが起動した直後に、設定された当月のカレンダーが画面に描画される。
-window.onload = function () {
-    showCalendar(showdate);
-    // TODO: ボタン関数をここに定義する（未定義だとクリック時にエラーになる）
-}
-
-function showCalendar(date) {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1; // (※getMonth()は0-11なので+1が必要)
-
-    // IDが「year_month_label」の要素（HTMLのpタグ）を探し、
-    // その中身（innerHTML）を「〇〇年 〇〇月」という文字列に書き換える
-    // ${}はテンプレートリテラルといい、動的に値を埋め込む
-    document.querySelector('#year_month_label').innerHTML = `${year}年 ${month}月`;
-    // IDが「calendar_body」の要素（HTMLのdivタグ）を探し、
-    // その中身（innerHTML）を、createCalendarTable関数が返すHTML（カレンダーの<table>）に書き換える
-    document.querySelector('#calendar_body').innerHTML = createCalendarTable(year, month);
-}
-
-// カレンダーテーブルの作成
-function createCalendarTable(year, month) {
-    let html = '<table class="calendar_tbl"><thead><tr>';
-
-    // 曜日のセルにクラスを付与
-    for (let i = 0; i < week.length; i++) {
-        const className = (i === 0) ? 'sun' : (i === 6) ? 'sat' : '';
-        html += `<th class="${className}">${week[i]}</th>`;
+    // 活動定義（マスタデータ）を取得
+    const activityDefinitions = await getActivities();
+    const activityMap = new Map();
+    if (Array.isArray(activityDefinitions)) {
+        activityDefinitions.forEach(a => activityMap.set(a.id, a));
     }
-    html += '</tr></thead><tbody>';
-    // 1日の曜日番号（0:日〜6:土）を取得。
-    // ※ new Date().getDay()は「曜日」を返す。
-    const startDay = new Date(year, month - 1, 1).getDay();
-    // ※ getDate()で「日」を、getDay()で「曜日」を取得できる。
 
-    // その月の最終日を取得（例: 31）。
-    // ※ new Date().getDate()は「日付」を返す。
-    const endDate = new Date(year, month, 0).getDate();
-    let count = 0;
+    // B. まず「外枠」だけを表示
+    appRoot.innerHTML = `
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <button id="prev-btn">＜ 前月</button>
+                <h2 id="month-label"></h2>
+                <button id="next-btn">次月 ＞</button>
+            </div>
+            <div id="calendar-grid" class="calendar-grid"></div>
+        </div>
+    `;
 
-    for (let i = 0; i < 6; i++) {
-        html += '<tr>';
-        for (let j = 0; j < 7; j++) {
-            let cellContent = '';
-            let cellClass = 'no_date';
+    // C. 中身を埋める関数を定義
+    async function update() {
+        const grid = document.getElementById('calendar-grid');
+        const label = document.getElementById('month-label');
 
-            if (i === 0 && j < startDay) {
-                // 前月の日付
-            } else if (count >= endDate) {
-                // 次月の日付
-            } else {
-                count++;
-                cellContent = count;
-                cellClass = 'with_date';
+        if (!grid || !label) return;
 
-                // ★★★ 今日の日付ならハイライト用のクラスを追加 ★★★
-                if (year === todayYear && month === todayMonth && count === todayDate) {
-                    cellClass += ' today';
-                }
+        // ヘッダー表示を更新
+        label.innerText = `${currentYear}年 ${currentMonth + 1}月`;
 
-                // 土日にもクラスを追加
-                if (j === 0) { cellClass += ' sun'; }
-                if (j === 6) { cellClass += ' sat'; }
+        // その月のログデータを取得
+        // monthは1始まりで渡す
+        const logs = await fetchLogs(currentYear, currentMonth + 1);
 
-                // ★★★ data-date属性に完全な日付情報を格納 ★★★
-                html += `<td class="${cellClass}" data-date="${year}-${month}-${count}">${cellContent}</td>`;
-                continue; // 既に<td>を出力したので次のループへ
-            }
+        // --- カレンダーの計算ロジック ---
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay(); // 1日の曜日
+        const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate(); // 月の末日
 
-            html += `<td class="${cellClass}">${cellContent}</td>`;
+        let html = '';
+        // 曜日の見出し
+        ['日', '月', '火', '水', '木', '金', '土'].forEach(d => html += `<div class="weekday">${d}</div>`);
+
+        // 1日より前の空白
+        for (let i = 0; i < firstDay; i++) html += `<div class="day empty"></div>`;
+
+        // 日付の生成
+        for (let date = 1; date <= lastDate; date++) {
+            // Javaのデータと照合するための日付文字列 (例: 2026-02-01)
+            const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+            
+            // その日のログを抽出
+            const todaysLogs = Array.isArray(logs) ? logs.filter(l => l.logDate === dateStr) : [];
+
+            // ラベル生成
+            const labels = todaysLogs.map(log => {
+                const activity = activityMap.get(log.activityId);
+                const title = activity ? activity.title : '不明';
+                // 表示スタイル（アイコンなど）があれば使うことも可能
+                // 今回はシンプルにタイトル先頭5文字
+                return `<div class="log-label" title="${title}">${title.substring(0, 5)}</div>`;
+            }).join('');
+
+            html += `<div class="day">
+                        <span>${date}</span>
+                        <div class="log-container">${labels}</div>
+                     </div>`;
         }
-        html += '</tr>';
-
-        // 最終週が空の場合にループを抜ける（カレンダーの見た目を整える）
-        if (count >= endDate) break;
+        grid.innerHTML = html;
     }
-    html += '</tbody></table>';
-    return html;
-}
 
-// 注意: 上記のコードでは、まだprev_month()などのボタン関数は未定義です。
-// 定義しないと、HTMLのボタンをクリックした際にエラーが発生します。
+    // D. 【onclickの設定】 ボタンを動くようにする
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    if (prevBtn) prevBtn.onclick = () => {
+        currentMonth--;
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        update(); // 月を更新して再描画
+    };
+
+    if (nextBtn) nextBtn.onclick = () => {
+        currentMonth++;
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+        update(); // 月を更新して再描画
+    };
+
+    // E. 最初に1回実行して初期画面を出す
+    await update();
+}
