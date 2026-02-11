@@ -1,3 +1,394 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+    padding-bottom: 70px; /* Space for bottom nav */
+}
+
+#app-root {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Auth Screens */
+.auth-box {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+}
+
+.auth-box h2 {
+    margin-top: 0;
+    text-align: center;
+    color: #007bff;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box; /* Important for width: 100% */
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.auth-nav {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.auth-nav a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+/* Calendar Styles */
+.calendar-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #f1f3f5;
+    border-bottom: 1px solid #ddd;
+}
+
+.calendar-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.calendar-header button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #007bff;
+    padding: 5px 10px;
+}
+
+.calendar-header button:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 4px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background-color: #ddd; /* Grid lines color */
+    gap: 1px;
+}
+
+.weekday {
+    background-color: #f8f9fa;
+    text-align: center;
+    padding: 10px 0;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.day {
+    background-color: #fff;
+    min-height: 80px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.day.empty {
+    background-color: #fcfcfc;
+}
+
+.day span {
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 4px;
+    display: block;
+    width: 100%;
+    text-align: right;
+    color: #444;
+}
+
+.log-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    width: 100%;
+}
+
+.log-label {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    border-radius: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Add Log Screen */
+.add-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.add-container h2 {
+    text-align: center;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.activity-card {
+    background: #fff;
+    border: 2px solid #f0f0f0;
+    border-radius: 16px;
+    padding: 20px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    outline: none;
+}
+
+.activity-card:hover {
+    border-color: #007bff;
+    background-color: #f0f7ff;
+}
+
+.activity-card:active {
+    transform: scale(0.95);
+    background-color: #e0efff;
+}
+
+.activity-card .icon {
+    font-size: 2.2rem;
+}
+
+.activity-card .name {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #444;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+}
+
+.btn-link {
+    display: inline-block;
+    margin-top: 15px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Activity Manager Styles */
+.activity-manager {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.activity-form-container {
+    background: #f1f3f5;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.activity-form-container input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    flex: 1;
+}
+
+.activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.activity-icon {
+    font-size: 1.5rem;
+    width: 30px;
+    text-align: center;
+}
+
+.activity-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.activity-actions button {
+    margin-left: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-edit {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.btn-edit:hover {
+    background-color: #e0a800;
+}
+
+/* Log List Styles */
+.log-list-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.log-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.log-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.log-item:last-child {
+    border-bottom: none;
+}
+
+.log-info {
+    flex-grow: 1;
+}
+
+.log-date {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.log-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.log-memo {
+    margin-top: 5px;
+    font-size: 0.9rem;
+    color: #666;
+    background: #f9f9f9;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
 /* ナビバー全体を下に固定 */
 .bottom-nav {
     position: fixed;

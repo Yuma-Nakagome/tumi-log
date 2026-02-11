@@ -40,8 +40,8 @@ public class ActivityService {
         Activity newActivity = new Activity();
         newActivity.setTitle(activityDto.getTitle());
         newActivity.setDisplayStyle(activityDto.getDisplayStyle());
-        // 【一時対応】固定のユーザーID（例: 1L）を取得
-        User defaultUser = userRepository.findById(1L)
+        // ユーザーIDを取得
+        User defaultUser = userRepository.findById(activityDto.getUserId())
                 .orElseThrow(() -> new IllegalStateException("デフォルトユーザーが見つかりません。先にユーザー登録が必要です。"));
         newActivity.setUser(defaultUser);
         // 3. データベースへの保存
