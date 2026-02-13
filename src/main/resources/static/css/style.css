@@ -132,10 +132,20 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    transition: all 0.2s ease; /* アニメーションを追加 */
+    cursor: pointer; /* マウスカーソルを指の形にする */
+}
+
+/* 日付セルをホバーした時のスタイル */
+.day:not(.empty):hover {
+    background-color: #f0f7ff; /* 薄い青色に */
+    box-shadow: inset 0 0 0 2px #007bff; /* 内側に枠線を出す */
+    z-index: 10;
 }
 
 .day.empty {
     background-color: #fcfcfc;
+    cursor: default; /* 空白セルはカーソルを戻す */
 }
 
 .day span {
