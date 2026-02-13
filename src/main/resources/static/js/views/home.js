@@ -54,7 +54,7 @@ export async function renderHome(appRoot) {
         for (let date = 1; date <= lastDate; date++) {
             // Javaのデータと照合するための日付文字列 (例: 2026-02-01)
             const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
-            
+
             // その日のログを抽出
             const todaysLogs = Array.isArray(logs) ? logs.filter(l => l.logDate === dateStr) : [];
 
@@ -67,10 +67,11 @@ export async function renderHome(appRoot) {
                 return `<div class="log-label" title="${title}">${title.substring(0, 5)}</div>`;
             }).join('');
 
-            html += `<div class="day">
+            html += `<div class="day" onclick="location.hash='#add?date=${dateStr}'" style="cursor: pointer;">
                         <span>${date}</span>
                         <div class="log-container">${labels}</div>
                      </div>`;
+
         }
         grid.innerHTML = html;
     }

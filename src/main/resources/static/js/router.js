@@ -16,7 +16,13 @@ import { checkAuth } from './api.js';
 // URLのハッシュ（#以降）の変化に合わせて、appRootの中身を書き換えるメイン関数
 export async function handleRoute(appRoot) {
     // 現在のハッシュを取得し、何もなければ「#home」をデフォルトとする
-    const hash = window.location.hash || '#home';
+    const fullHash = window.location.hash || '#home';
+    // "?" で分割して、[0]にハッシュ名、[1]にパラメータを入れる
+    const [hash, queryString] = fullHash.split('?');
+
+    // パラメータを使いやすいように解析する
+    const params = new URLSearchParams(queryString);
+    const selectedDate = params.get('date');
 
     // ログインしていないと閲覧できない「保護されたページ」のリスト
     const isPrivate = ['#home', '#log', '#add', '#stats', '#settings'].includes(hash);
@@ -61,7 +67,7 @@ export async function handleRoute(appRoot) {
         await renderLog(appRoot);
     } else if (hash === '#add') {
         // 記録追加画面を表示
-        await renderAdd(appRoot);
+        await renderAdd(appRoot, selectedDate);
     } else if (hash === '#settings') {
         // 設定画面を表示
         appRoot.innerHTML = await renderSettings();

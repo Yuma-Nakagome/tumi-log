@@ -1,17 +1,22 @@
 import { getActivities, createLog } from '../api.js';
 
-export async function renderAdd(appRoot) {
+export async function renderAdd(appRoot, selectedDate) {
     // 1. ユーザーが登録した活動一覧を取得
     const activities = await getActivities();
+
+    // 日付を確定させる（渡された日付があればそれ、なければ今日）
+    const targetDate = selectedDate || new Date().toLocaleDateString('sv-SE');
 
     // 2. HTML構造をセット
     appRoot.innerHTML = `
         <div class="add-container">
             <h2>どの活動をしましたか？</h2>
-            <p class="subtitle">タップして今日の記録を追加します</p>
+            <p class="subtitle">日付: <strong>${targetDate}</strong> の記録を追加します</p>
+            
             <div id="activity-selection" class="activity-grid">
                 <!-- ここに活動ボタンが動的に追加されます -->
             </div>
+            
             ${activities.length === 0 ? `
                 <div class="empty-state">
                     <p>まだ活動の種類が登録されていません。</p>
@@ -34,9 +39,6 @@ export async function renderAdd(appRoot) {
 
         // 4. ボタンクリック時の保存処理
         btn.onclick = async () => {
-            // ローカル時刻で YYYY-MM-DD 形式を取得 (sv-SEロケールを使うと簡単です)
-            const today = new Date().toLocaleDateString('sv-SE'); 
-
             // 二重送信防止
             btn.disabled = true;
             btn.style.opacity = '0.5';
@@ -44,8 +46,8 @@ export async function renderAdd(appRoot) {
             try {
                 await createLog({
                     activityId: activity.id,
-                    logDate: today,
-                    memo: "" // シンプルにするためメモは空。必要に応じて後で入力ダイアログ等を追加可能
+                    logDate: targetDate, // 確定させた日付を使用
+                    memo: "" 
                 });
                 
                 // 成功時はホーム（カレンダー）へ
