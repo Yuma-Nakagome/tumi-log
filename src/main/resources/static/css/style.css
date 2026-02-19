@@ -255,7 +255,77 @@ body {
     font-weight: bold;
 }
 
-/* Activity Manager Styles */
+/* 詳細画面のスタイル */
+.details-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.details-header {
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+.details-log-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 30px;
+}
+
+.details-log-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px;
+    border-bottom: 1px solid #f9f9f9;
+}
+
+.details-log-item .activity-icon {
+    font-size: 1.8rem;
+}
+
+.details-log-item .activity-title {
+    font-weight: bold;
+    display: block;
+    font-size: 1.1rem;
+}
+
+.details-log-item .activity-memo {
+    margin: 5px 0 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.details-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-secondary {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+}
+
+.btn-secondary:hover {
+    background-color: #e9ecef;
+}
+
+.empty-msg, .loading, .error-msg {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+    list-style: none;
+}
 .activity-manager {
     background: #fff;
     padding: 20px;

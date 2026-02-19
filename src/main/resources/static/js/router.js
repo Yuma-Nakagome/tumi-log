@@ -12,6 +12,7 @@ import { renderRegister, initRegister } from './views/register.js';
 import { renderSettings, initSettings } from './views/setting.js';
 // 現在のログイン状態を確認する共通関数をインポート
 import { checkAuth } from './api.js';
+import { renderDetails } from './views/details.js';
 
 // URLのハッシュ（#以降）の変化に合わせて、appRootの中身を書き換えるメイン関数
 export async function handleRoute(appRoot) {
@@ -72,6 +73,8 @@ export async function handleRoute(appRoot) {
         // 設定画面を表示
         appRoot.innerHTML = await renderSettings();
         initSettings();
+    } else if (hash === '#details') {
+        await renderDetails(appRoot, selectedDate);
     } else {
         // 該当するページがない（404）場合に、とりあえずホームへ飛ばす
         window.location.hash = '#home';
