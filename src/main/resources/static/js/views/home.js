@@ -67,7 +67,7 @@ export async function renderHome(appRoot) {
                 return `<div class="log-label" title="${title}">${title.substring(0, 5)}</div>`;
             }).join('');
 
-            html += `<div class="day" onclick="location.hash='#add?date=${dateStr}'" style="cursor: pointer;">
+            html += `<div class="day" onclick="location.hash='#details?date=${dateStr}'" style="cursor: pointer;">
                         <span>${date}</span>
                         <div class="log-container">${labels}</div>
                      </div>`;
