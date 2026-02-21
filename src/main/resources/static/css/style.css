@@ -300,6 +300,23 @@ body {
     font-size: 0.9rem;
 }
 
+.delete-btn {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-left: auto;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.delete-btn:hover {
+    background-color: #fa5252;
+}
+
 .details-actions {
     display: flex;
     flex-direction: column;

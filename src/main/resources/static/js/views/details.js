@@ -1,4 +1,4 @@
-import { fetchLogsByDate, getActivities } from '../api.js';
+import { fetchLogsByDate, getActivities, deleteLog } from '../api.js';
 
 export async function renderDetails(appRoot, selectedDate) {
     // 1. 活動定義を取得してマップを作成（IDから名前を引くため）
@@ -55,9 +55,23 @@ export async function renderDetails(appRoot, selectedDate) {
                         <span class="activity-title">${activity ? activity.title : '不明な活動'}</span>
                         ${log.memo ? `<p class="activity-memo">${log.memo}</p>` : ''}
                     </div>
+                    <button class="delete-btn" data-id="${log.id}">削除</button>
                 </li>
             `;
         }).join('');
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const logId = e.currentTarget.getAttribute('data-id');
+                try {
+                    await deleteLog(logId);
+                    // 削除後にリストを更新
+                    renderDetails(appRoot, selectedDate);
+                } catch (error) {
+                    alert('削除に失敗しました。');
+                }
+            });
+        });
 
     } catch (error) {
         console.error('詳細表示エラー:', error);
