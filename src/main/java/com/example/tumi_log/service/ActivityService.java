@@ -40,6 +40,7 @@ public class ActivityService {
         Activity newActivity = new Activity();
         newActivity.setTitle(activityDto.getTitle());
         newActivity.setDisplayStyle(activityDto.getDisplayStyle());
+        newActivity.setArchive(false);
         // ユーザーIDを取得
         User defaultUser = userRepository.findById(activityDto.getUserId())
                 .orElseThrow(() -> new IllegalStateException("デフォルトユーザーが見つかりません。先にユーザー登録が必要です。"));
@@ -52,10 +53,57 @@ public class ActivityService {
         createdActivityDto.setUserId(savedActivity.getUser().getId());
         createdActivityDto.setTitle(savedActivity.getTitle());
         createdActivityDto.setDisplayStyle(savedActivity.getDisplayStyle());
+        createdActivityDto.setArchive(savedActivity.isArchive());
 
         return createdActivityDto; // DTOを返却
     }
     // 役割：メソッド内のDB操作を一連の作業として扱い、成功でコミット、失敗でロールバック（取り消し）する
+
+    @Transactional
+    public List<ActivityDto> getActivitiesByUserId(Long userId) {
+        // 1. RepositoryからEntityのリストを取得 (ActivityDtoは使わず、userIdを直接渡す)
+        List<Activity> foundAllActivies = activityRepository.findByUserIdAndArchiveFalse(userId);
+        // 2. EntityのリストをDTOのリストに変換 (Stream APIを使用)
+        return foundAllActivies.stream()
+                // activity はリスト内の Activity エンティティ1つ1つ
+                .map(activity -> {
+                    // 2-1. 新しいDTOを作成
+                    ActivityDto dto = new ActivityDto();
+                    // 2-2. EntityからDTOへ値をコピー
+                    dto.setId(activity.getId());
+                    dto.setTitle(activity.getTitle());
+                    dto.setDisplayStyle(activity.getDisplayStyle());
+                    // UserエンティティからIDを取り出してセット
+                    dto.setUserId(activity.getUser().getId());
+                    dto.setArchive(activity.isArchive());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        // リストが空なら、空のList<ActivityDto>を返す
+    }
+
+    @Transactional
+    public List<ActivityDto> getAllActivitiesIncludingArchived(Long userId) {
+        // 1. RepositoryからEntityのリストを取得 (ActivityDtoは使わず、userIdを直接渡す)
+        List<Activity> foundAllActivies = activityRepository.findByUserId(userId);
+        // 2. EntityのリストをDTOのリストに変換 (Stream APIを使用)
+        return foundAllActivies.stream()
+                // activity はリスト内の Activity エンティティ1つ1つ
+                .map(activity -> {
+                    // 2-1. 新しいDTOを作成
+                    ActivityDto dto = new ActivityDto();
+                    // 2-2. EntityからDTOへ値をコピー
+                    dto.setId(activity.getId());
+                    dto.setTitle(activity.getTitle());
+                    dto.setDisplayStyle(activity.getDisplayStyle());
+                    // UserエンティティからIDを取り出してセット
+                    dto.setUserId(activity.getUser().getId());
+                    dto.setArchive(activity.isArchive());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        // リストが空なら、空のList<ActivityDto>を返す
+    }
 
     @Transactional
     public ActivityDto updateActivity(ActivityDto activityDto, Long id) {
@@ -78,29 +126,8 @@ public class ActivityService {
     }
 
     @Transactional
-    public List<ActivityDto> getActivitiesByUserId(Long userId) {
-        // 1. RepositoryからEntityのリストを取得 (ActivityDtoは使わず、userIdを直接渡す)
-        List<Activity> foundAllActivies = activityRepository.findByUserId(userId);
-        // 2. EntityのリストをDTOのリストに変換 (Stream APIを使用)
-        return foundAllActivies.stream()
-                // activity はリスト内の Activity エンティティ1つ1つ
-                .map(activity -> {
-                    // 2-1. 新しいDTOを作成
-                    ActivityDto dto = new ActivityDto();
-                    // 2-2. EntityからDTOへ値をコピー
-                    dto.setId(activity.getId());
-                    dto.setTitle(activity.getTitle());
-                    dto.setDisplayStyle(activity.getDisplayStyle());
-                    // UserエンティティからIDを取り出してセット
-                    dto.setUserId(activity.getUser().getId());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-        // リストが空なら、空のList<ActivityDto>を返す
-    }
-
-    @Transactional
     public void deletedActivity(Long id) {
         activityRepository.deleteById(id);
     }
+
 }

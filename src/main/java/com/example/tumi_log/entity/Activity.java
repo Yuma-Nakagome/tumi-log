@@ -25,4 +25,12 @@ public class Activity {
 
     @Column(name = "display_style", length = 100, nullable = true)
     private String displayStyle;
+
+    // なぜ boolean（小文字）がいいのか？
+    // Boolean（大文字）は初期値が null になります。
+    // boolean（小文字）は初期値が false になります。
+    // nullable = false の設定と非常に相性が良く、エラーが起きにくくなります。
+    @Builder.Default // ビルダーパターンでオブジェクトを生成する際のデフォルト値を指定
+    @Column(name = "archive", nullable = false)
+    private boolean archive = false;
 }

@@ -22,4 +22,6 @@ public class ActivityDto {
     @NotBlank
     @Size(min = 1, max = 30, message = "アイコンは1〜30字以内で入力してください。")
     private String displayStyle;
+
+    private boolean archive = false;
 }
