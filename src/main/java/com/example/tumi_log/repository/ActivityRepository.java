@@ -10,4 +10,6 @@ import com.example.tumi_log.entity.Activity;
 @Repository
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Activity> findByUserId(Long UserId);
+
+    List<Activity> findByUserIdAndArchiveFalse(Long UserId);
 }
