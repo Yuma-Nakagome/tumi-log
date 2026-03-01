@@ -10,7 +10,7 @@ import com.example.tumi_log.entity.User;
 import com.example.tumi_log.repository.ActivityRepository;
 import com.example.tumi_log.repository.UserRepository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ActivityService {
@@ -36,71 +36,39 @@ public class ActivityService {
     public ActivityDto createActivity(ActivityDto activityDto) {
         // 【コンストラクタの呼び出し】: new Activity() により、Activityクラスのコンストラクタが呼ばれ、インスタンスが生まれる
         // 【インスタンス】: Activityクラスの「設計図」から作られた「実体」（新しいアクティビティデータ）
-        // 2. DTOからエンティティへの変換
-        Activity newActivity = new Activity();
-        newActivity.setTitle(activityDto.getTitle());
-        newActivity.setDisplayStyle(activityDto.getDisplayStyle());
-        newActivity.setArchive(false);
         // ユーザーIDを取得
         User defaultUser = userRepository.findById(activityDto.getUserId())
                 .orElseThrow(() -> new IllegalStateException("デフォルトユーザーが見つかりません。先にユーザー登録が必要です。"));
-        newActivity.setUser(defaultUser);
+        Activity newActivity = convertToEntity(activityDto, defaultUser);// 2. DTOからエンティティへの変換
+        newActivity.setArchive(false);
         // 3. データベースへの保存
         Activity savedActivity = activityRepository.save(newActivity);
         // 3. EntityからDTOへの変換（Controllerへの戻り値）
-        ActivityDto createdActivityDto = new ActivityDto();
-        createdActivityDto.setId(savedActivity.getId());
-        createdActivityDto.setUserId(savedActivity.getUser().getId());
-        createdActivityDto.setTitle(savedActivity.getTitle());
-        createdActivityDto.setDisplayStyle(savedActivity.getDisplayStyle());
-        createdActivityDto.setArchive(savedActivity.isArchive());
-
-        return createdActivityDto; // DTOを返却
+        return convertToDto(savedActivity); // DTOを返却
     }
     // 役割：メソッド内のDB操作を一連の作業として扱い、成功でコミット、失敗でロールバック（取り消し）する
 
-    @Transactional
-    public List<ActivityDto> getActivitiesByUserId(Long userId) {
-        // 1. RepositoryからEntityのリストを取得 (ActivityDtoは使わず、userIdを直接渡す)
-        List<Activity> foundAllActivies = activityRepository.findByUserIdAndArchiveFalse(userId);
-        // 2. EntityのリストをDTOのリストに変換 (Stream APIを使用)
-        return foundAllActivies.stream()
-                // activity はリスト内の Activity エンティティ1つ1つ
-                .map(activity -> {
-                    // 2-1. 新しいDTOを作成
-                    ActivityDto dto = new ActivityDto();
-                    // 2-2. EntityからDTOへ値をコピー
-                    dto.setId(activity.getId());
-                    dto.setTitle(activity.getTitle());
-                    dto.setDisplayStyle(activity.getDisplayStyle());
-                    // UserエンティティからIDを取り出してセット
-                    dto.setUserId(activity.getUser().getId());
-                    dto.setArchive(activity.isArchive());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-        // リストが空なら、空のList<ActivityDto>を返す
-    }
-
-    @Transactional
-    public List<ActivityDto> getAllActivitiesIncludingArchived(Long userId) {
+    @Transactional(readOnly = true)
+    public List<ActivityDto> getAllActivities(Long userId) {
         // 1. RepositoryからEntityのリストを取得 (ActivityDtoは使わず、userIdを直接渡す)
         List<Activity> foundAllActivies = activityRepository.findByUserId(userId);
         // 2. EntityのリストをDTOのリストに変換 (Stream APIを使用)
         return foundAllActivies.stream()
                 // activity はリスト内の Activity エンティティ1つ1つ
-                .map(activity -> {
-                    // 2-1. 新しいDTOを作成
-                    ActivityDto dto = new ActivityDto();
-                    // 2-2. EntityからDTOへ値をコピー
-                    dto.setId(activity.getId());
-                    dto.setTitle(activity.getTitle());
-                    dto.setDisplayStyle(activity.getDisplayStyle());
-                    // UserエンティティからIDを取り出してセット
-                    dto.setUserId(activity.getUser().getId());
-                    dto.setArchive(activity.isArchive());
-                    return dto;
-                })
+                // プロの現場でよく見る書き方（メソッド参照）
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        // リストが空なら、空のList<ActivityDto>を返す
+    }
+
+    @Transactional(readOnly = true)
+    public List<ActivityDto> getActiveActivities(Long userId) {
+        // 1. RepositoryからEntityのリストを取得 (ActivityDtoは使わず、userIdを直接渡す)
+        List<Activity> foundAllActivies = activityRepository.findByUserIdAndArchiveFalse(userId);
+        // 2. EntityのリストをDTOのリストに変換 (Stream APIを使用)
+        return foundAllActivies.stream()
+                // activity はリスト内の Activity エンティティ1つ1つ
+                .map(this::convertToDto)
                 .collect(Collectors.toList());
         // リストが空なら、空のList<ActivityDto>を返す
     }
@@ -115,19 +83,33 @@ public class ActivityService {
         updatedActivity.setDisplayStyle(activityDto.getDisplayStyle());
         // 3. データベースへの保存
         Activity savedActivity = activityRepository.save(updatedActivity);
-        // 3. EntityからDTOへの変換（Controllerへの戻り値）
-        ActivityDto updatedActivityDto = new ActivityDto();
-        updatedActivityDto.setId(savedActivity.getId());
-        updatedActivityDto.setUserId(savedActivity.getUser().getId());
-        updatedActivityDto.setTitle(savedActivity.getTitle());
-        updatedActivityDto.setDisplayStyle(savedActivity.getDisplayStyle());
-
-        return updatedActivityDto; // DTOを返却
+        return convertToDto(savedActivity); // DTOを返却
     }
 
     @Transactional
-    public void deletedActivity(Long id) {
-        activityRepository.deleteById(id);
+    public ActivityDto toggleArchive(Long id, boolean isArchive) {
+        Activity activity = activityRepository.findById(id).orElseThrow();
+        activity.setArchive(isArchive); // 状態を書き換える（自動保存の対象になる）
+        // repository.save(activity); // 書いても書かなくても、メソッド終了時に更新される
+        return convertToDto(activity);
     }
 
+    private ActivityDto convertToDto(Activity activity) {
+        ActivityDto dto = new ActivityDto();
+        dto.setId(activity.getId());
+        dto.setTitle(activity.getTitle());
+        dto.setDisplayStyle(activity.getDisplayStyle());
+        dto.setUserId(activity.getUser().getId());
+        dto.setArchive(activity.isArchive());
+        return dto;
+    }
+
+    private Activity convertToEntity(ActivityDto activityDto, User defaultUser) {
+        Activity activity = new Activity();
+        activity.setTitle(activityDto.getTitle());
+        activity.setDisplayStyle(activityDto.getDisplayStyle());
+        activity.setUser(defaultUser);
+        activity.setArchive(activityDto.isArchive());
+        return activity;
+    }
 }

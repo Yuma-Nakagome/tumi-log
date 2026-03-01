@@ -47,9 +47,9 @@ export async function renderAdd(appRoot, selectedDate) {
                 await createLog({
                     activityId: activity.id,
                     logDate: targetDate, // 確定させた日付を使用
-                    memo: "" 
+                    memo: ""
                 });
-                
+
                 // 成功時はホーム（カレンダー）へ
                 window.location.hash = '#home';
             } catch (error) {

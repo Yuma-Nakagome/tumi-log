@@ -2,16 +2,20 @@ package com.example.tumi_log.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import java.util.List;
+
 import com.example.tumi_log.dto.ActivityDto;
 import com.example.tumi_log.service.ActivityService;
+import com.example.tumi_log.service.CustomUserDetails;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,17 +51,22 @@ public class ActivityController {
         return ResponseEntity.ok(putActivity);
     }
 
-    @GetMapping("/user/{userid}")
-    // @PathVaria URLパスの一部を変数として取り出す
-    public ResponseEntity<List<ActivityDto>> getActivitiesForUser(@PathVariable Long userid) {
-        List<ActivityDto> foundActivities = activityService.getActivitiesByUserId(userid);
+    @GetMapping
+    public ResponseEntity<List<ActivityDto>> getActivities(@AuthenticationPrincipal CustomUserDetails principal,
+            @RequestParam(defaultValue = "false") boolean includeArchived) {
+        Long userId = principal.getId();
+        // 窓口は1つだが、中身のロジックをここで切り替える
+        List<ActivityDto> foundActivities = includeArchived
+                ? activityService.getAllActivities(userId) // includeArchived=true の場合、非表示のアクティビティも含める
+                : activityService.getActiveActivities(userId); // includeArchived=false
+                                                               // の場合、非表示のアクティビティは除外する
         return ResponseEntity.status(HttpStatus.OK).body(foundActivities);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteActivity(@PathVariable Long id) {
-        activityService.deletedActivity(id);
-        return ResponseEntity.noContent().build();
+    @PatchMapping("/{id}/archive")
+    public ResponseEntity<ActivityDto> updateArchiveStatus(@PathVariable Long id, @RequestParam boolean status) {
+        ActivityDto updatedDto = activityService.toggleArchive(id, status);
+        return ResponseEntity.ok(updatedDto);
     }
 
 }
