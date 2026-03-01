@@ -66,12 +66,13 @@ export async function fetchLogsByDate(dateStr) {
 }
 
 // アクティビティ定義の一覧を取得する関数
-export async function getActivities() {
+export async function getActivities(includeArchived = false) {
     const user = await checkAuth();
     if (!user) return [];
-    const response = await fetch(`/api/activities/user/${user.id}`);
+    const response = await fetch(`/api/activities?includeArchived=${includeArchived}`);
     return response.ok ? await response.json() : [];
 }
+
 
 // ログを削除する関数
 export async function deleteLog(logId) {
@@ -127,12 +128,14 @@ export async function updateActivity(id, activityData) {
     if (!response.ok) throw new Error('アクティビティの更新に失敗しました');
     return await response.json();
 }
-
-// アクティビティを削除する関数
-export async function deleteActivity(id) {
-    const response = await fetch(`/api/activities/${id}`, {
-        method: 'DELETE'
+// アクティビティを表示/非表示を切り替える関数
+export async function toggleActivityArchive(id, status) {
+    const response = await fetch(`/api/activities/${id}/archive?status=${status}`, {
+        method: 'PATCH' // ここもPATCHに合わせる
     });
-    if (!response.ok) throw new Error('アクティビティの削除に失敗しました');
-    return true;
+
+    if (!response.ok) throw new Error('更新失敗');
+
+    // Javaから返ってきた最新のDTOをそのまま返す
+    return await response.json();
 }
