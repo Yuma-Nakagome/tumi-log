@@ -1,280 +1,161 @@
+:root {
+    --brand-color: #4F46E5;
+    --brand-color-soft: rgba(79, 70, 229, 0.08);
+    --brand-color-border: rgba(79, 70, 229, 0.15);
+    --bg-color: #F2F2F7;
+    --card-bg: #FFFFFF;
+    --text-primary: #000000;
+    --text-secondary: #8E8E93;
+    --radius: 14px;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
-    color: #333;
-    padding-bottom: 70px;
-    /* Space for bottom nav */
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 100px;
 }
 
 #app-root {
-    padding: 20px;
-    max-width: 600px;
+    max-width: 500px;
     margin: 0 auto;
-}
-
-/* Auth Screens */
-.auth-box {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin-top: 50px;
-}
-
-.auth-box h2 {
-    margin-top: 0;
-    text-align: center;
-    color: #007bff;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 12px 0; /* 左右の余白を完全にゼロにしました */
     box-sizing: border-box;
-    /* Important for width: 100% */
-}
-
-.btn-primary {
     width: 100%;
-    padding: 12px;
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s;
 }
 
-.btn-primary:hover {
-    background-color: #0056b3;
+/* フォームや詳細などは左右の余白が欲しいので別途調整 */
+.activity-manager, .add-container, .details-container, .settings-container {
+    padding-left: 16px;
+    padding-right: 16px;
 }
 
-.auth-nav {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 14px;
-}
-
-.auth-nav a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-/* Calendar Styles */
-.calendar-container {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
+/* ボタン基本 */
+.btn-main, .btn-sub, .btn-danger, .btn-edit, .delete-btn {
+    display: inline-flex;
     align-items: center;
-    padding: 15px;
-    background-color: #f1f3f5;
-    border-bottom: 1px solid #ddd;
-}
-
-.calendar-header h2 {
-    margin: 0;
-    font-size: 1.2rem;
-}
-
-.calendar-header button {
-    background: none;
+    justify-content: center;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
     border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    color: #007bff;
-    padding: 5px 10px;
-}
-
-.calendar-header button:hover {
-    background-color: rgba(0, 123, 255, 0.1);
-    border-radius: 4px;
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    background-color: #ddd;
-    /* Grid lines color */
-    gap: 1px;
-}
-
-.weekday {
-    background-color: #f8f9fa;
-    text-align: center;
-    padding: 10px 0;
-    font-weight: bold;
-    font-size: 0.9rem;
-    color: #666;
-}
-
-.day {
-    background-color: #fff;
-    min-height: 80px;
-    padding: 5px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    transition: all 0.2s ease;
-    /* アニメーションを追加 */
-    cursor: pointer;
-    /* マウスカーソルを指の形にする */
-}
-
-/* 日付セルをホバーした時のスタイル */
-.day:not(.empty):hover {
-    background-color: #f0f7ff;
-    /* 薄い青色に */
-    box-shadow: inset 0 0 0 2px #007bff;
-    /* 内側に枠線を出す */
-    z-index: 10;
-}
-
-.day.empty {
-    background-color: #fcfcfc;
-    cursor: default;
-    /* 空白セルはカーソルを戻す */
-}
-
-.day span {
-    font-size: 0.9rem;
-    font-weight: bold;
-    margin-bottom: 4px;
-    display: block;
-    width: 100%;
-    text-align: right;
-    color: #444;
-}
-
-.log-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2px;
-    width: 100%;
-}
-
-.log-label {
-    background-color: #e3f2fd;
-    color: #0d47a1;
-    font-size: 0.75rem;
-    padding: 2px 4px;
-    border-radius: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    outline: none;
     box-sizing: border-box;
 }
 
-/* Add Log Screen */
-.add-container {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
+.btn-main:active, .btn-sub:active, .btn-danger:active { transform: scale(0.96); opacity: 0.8; }
+.btn-main { background: var(--brand-color); color: white; padding: 14px; width: 100%; font-size: 16px; }
+.btn-sub { background: #E9E9EB; color: var(--text-primary); padding: 14px; width: 100%; font-size: 16px; }
 
-.add-container h2 {
-    text-align: center;
-    margin-bottom: 5px;
-    color: #333;
-}
-
-.subtitle {
-    text-align: center;
-    color: #888;
-    font-size: 0.9rem;
-    margin-bottom: 20px;
-}
+/* 記録追加カード (iOSスタイル) */
+.add-container h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; text-align: center; }
+.subtitle { color: var(--text-secondary); font-size: 15px; margin-bottom: 24px; text-align: center; }
 
 .activity-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 16px;
 }
 
 .activity-card {
-    background: #fff;
-    border: 2px solid #f0f0f0;
-    border-radius: 16px;
-    padding: 20px 10px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 24px 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    outline: none;
+    gap: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
 }
 
-.activity-card:hover {
-    border-color: #007bff;
-    background-color: #f0f7ff;
+.activity-card:active { transform: scale(0.95); opacity: 0.7; }
+.activity-card .icon { font-size: 36px; }
+.activity-card .name { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+
+/* カレンダー (全幅・崩れ防止) */
+.calendar-container { 
+    background: var(--card-bg); 
+    border-radius: 0; /* 左右いっぱいの時は角丸なしがiOSらしい */
+    box-shadow: none;
+    width: 100%;
+    border-top: 1px solid #E5E5EA;
+    border-bottom: 1px solid #E5E5EA;
 }
 
-.activity-card:active {
-    transform: scale(0.95);
-    background-color: #e0efff;
+.calendar-header { 
+    display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid #E5E5EA; 
+}
+.calendar-header h2 { font-size: 17px; font-weight: 700; margin: 0; }
+.calendar-header button { background: none; color: var(--brand-color); border: none; font-weight: 600; font-size: 14px; cursor: pointer; }
+
+.calendar-grid { 
+    display: grid; 
+    grid-template-columns: repeat(7, minmax(0, 1fr)); 
+    background: #E5E5EA; 
+    gap: 0.5px; 
+    width: 100%;
 }
 
-.activity-card .icon {
-    font-size: 2.2rem;
+.weekday { 
+    background: var(--card-bg); 
+    text-align: center; 
+    padding: 8px 0; 
+    font-size: 11px; 
+    font-weight: 600; 
+    color: var(--text-secondary); 
 }
 
-.activity-card .name {
-    font-weight: bold;
-    font-size: 1rem;
-    color: #444;
+.day { 
+    background: var(--card-bg); 
+    min-height: 95px; 
+    padding: 2px; /* 余白をさらに詰めました */
+    display: flex; 
+    flex-direction: column; 
+    align-items: stretch; 
+    cursor: pointer; 
+    box-sizing: border-box;
 }
 
-.empty-state {
+.day span { font-size: 11px; font-weight: 600; text-align: right; margin-bottom: 2px; color: var(--text-primary); padding-right: 2px; }
+.day.is-today span { color: var(--brand-color); font-weight: 800; }
+.day.empty { background: #F2F2F7; }
+
+.log-container { display: flex; flex-direction: column; gap: 1px; width: 100%; overflow: hidden; }
+.log-label { 
+    background: var(--brand-color-soft); 
+    color: var(--brand-color); 
+    font-size: 9px; 
+    padding: 1px 2px; 
+    border-radius: 2px; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    width: 100%;
+    box-sizing: border-box;
     text-align: center;
-    padding: 40px 20px;
-    color: #999;
 }
 
-.btn-link {
-    display: inline-block;
-    margin-top: 15px;
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-/* 詳細画面のスタイル */
+/* 詳細画面 */
 .details-container {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    background: var(--card-bg);
+    padding: 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
 }
 
 .details-header {
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 0.5px solid #E5E5EA;
     margin-bottom: 20px;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     text-align: center;
 }
 
@@ -286,278 +167,180 @@ body {
 
 .details-log-item {
     display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    padding: 15px;
-    border-bottom: 1px solid #f9f9f9;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 0.5px solid #F2F2F7;
+}
+
+.details-log-item:last-child {
+    border-bottom: none;
 }
 
 .details-log-item .activity-icon {
-    font-size: 1.8rem;
+    font-size: 24px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F2F2F7;
+    border-radius: 10px;
 }
 
-.details-log-item .activity-title {
-    font-weight: bold;
+.activity-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-title {
+    font-weight: 700;
+    font-size: 17px;
     display: block;
-    font-size: 1.1rem;
 }
 
-.details-log-item .activity-memo {
-    margin: 5px 0 0;
-    color: #666;
-    font-size: 0.9rem;
+.activity-memo {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 2px;
 }
 
 .delete-btn {
-    background-color: #ff6b6b;
-    color: white;
-    border: none;
+    background: rgba(255, 59, 48, 0.08);
+    color: #FF3B30;
     padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    margin-left: auto;
-    transition: background-color 0.2s;
-    white-space: nowrap;
+    font-size: 13px;
+    border-radius: 20px;
 }
 
-.delete-btn:hover {
-    background-color: #fa5252;
-}
-
-.details-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.btn-secondary {
-    background: #f8f9fa;
-    border: 1px solid #ddd;
-    padding: 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #666;
-}
-
-.btn-secondary:hover {
-    background-color: #e9ecef;
-}
-
-.empty-msg,
-.loading,
-.error-msg {
-    text-align: center;
-    padding: 20px;
-    color: #999;
-    list-style: none;
-}
-
-.activity-manager {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
+/* フォームエリア (iOSスタイル) */
 .activity-form-container {
-    background: #f1f3f5;
-    padding: 15px;
-    border-radius: 6px;
+    background: var(--card-bg);
+    padding: 16px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
     margin-bottom: 20px;
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
+    flex-direction: column;
+    gap: 12px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .activity-form-container input {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    flex: 1;
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #E5E5EA;
+    border-radius: 10px;
+    font-size: 15px;
+    background: #F2F2F7;
+    box-sizing: border-box;
 }
 
+.form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* リストアイテム */
 .activity-list {
     list-style: none;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     margin: 0;
+    width: 100%;
 }
 
 .activity-item {
+    background: var(--card-bg);
+    padding: 12px 16px;
+    border-radius: var(--radius);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-}
-
-.activity-item:last-child {
-    border-bottom: none;
+    box-shadow: var(--shadow-sm);
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .activity-info {
     display: flex;
     align-items: center;
-    gap: 10px;
-}
-
-.activity-icon {
-    font-size: 1.5rem;
-    width: 30px;
-    text-align: center;
+    gap: 12px;
 }
 
 .activity-name {
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
-.activity-actions button {
-    margin-left: 5px;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: 16px;
 }
 
 .btn-edit {
-    background-color: #ffc107;
-    color: #333;
+    background: var(--brand-color-soft);
+    color: var(--brand-color);
+    padding: 6px 12px;
+    font-size: 13px;
 }
 
-.btn-edit:hover {
-    background-color: #e0a800;
-}
-
-/* Log List Styles */
-.log-list-container {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.log-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.log-item {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.log-item:last-child {
-    border-bottom: none;
-}
-
-.log-info {
-    flex-grow: 1;
-}
-
-.log-date {
-    font-size: 0.85rem;
-    color: #888;
-    margin-bottom: 4px;
-}
-
-.log-title {
-    font-weight: bold;
-    font-size: 1.1rem;
-    color: #333;
-}
-
-.log-memo {
-    margin-top: 5px;
-    font-size: 0.9rem;
-    color: #666;
-    background: #f9f9f9;
-    padding: 5px;
-    border-radius: 4px;
-}
-
-.btn-danger {
-    background-color: #dc3545;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.btn-danger:hover {
-    background-color: #c82333;
-}
-
-/* ナビバー全体を下に固定 */
+/* 下部ナビ */
 .bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 60px;
+    height: 84px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     display: flex;
     justify-content: space-around;
-    /* アイコンを均等に配置 */
     align-items: center;
-    background: #fff;
-    border-top: 1px solid #ddd;
+    border-top: 0.5px solid rgba(0, 0, 0, 0.1);
     z-index: 1000;
+    padding-bottom: 20px;
+    box-sizing: border-box;
 }
 
-/* 各メニューのリンク */
 .bottom-nav a {
     text-decoration: none;
-    color: #666;
-    font-size: 12px;
+    color: #8E8E93;
+    font-size: 10px;
+    font-weight: 500;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 4px;
 }
 
-/* 真ん中の「＋」ボタンだけ目立たせる場合 */
 .add-button {
-    font-size: 24px !important;
-    font-weight: bold;
-    color: #fff !important;
-    background-color: #007bff;
-    /* 青色とかにする */
-    width: 50px;
-    height: 50px;
+    width: 44px;
+    height: 44px;
+    background: var(--brand-color) !important;
     border-radius: 50%;
-    /* 丸くする */
     display: flex;
     justify-content: center;
     align-items: center;
+    color: white !important;
+    font-size: 24px !important;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.24);
     margin-top: -30px;
-    /* 少し上に浮かせる（FAB風） */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* スイッチの外枠 */
-.switch {
+/* トグルスイッチ */
+.toggle-switch {
     position: relative;
     display: inline-block;
-    width: 46px;
-    height: 24px;
+    width: 51px;
+    height: 31px;
 }
 
-/* 本物のチェックボックスは隠す */
-.switch input {
+.toggle-switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-/* スライダー（背景部分） */
 .slider {
     position: absolute;
     cursor: pointer;
@@ -565,41 +348,33 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 24px;
+    background: #E3E3E8;
+    transition: .3s;
+    border-radius: 31px;
 }
 
-/* スライダー内の丸いツマミ */
 .slider:before {
     position: absolute;
     content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .4s;
+    height: 27px;
+    width: 27px;
+    left: 2px;
+    bottom: 2px;
+    background: white;
+    transition: .3s;
     border-radius: 50%;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
 }
 
-/* チェックが入った時の背景色（お好みの色に） */
 input:checked+.slider {
-    background-color: #2196F3;
+    background: #34C759;
 }
 
-/* チェックが入った時に丸を右に動かす */
 input:checked+.slider:before {
-    transform: translateX(22px);
+    transform: translateX(20px);
 }
 
-/* テキストとスイッチを横並びにするための調整 */
-.toggle-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-    font-size: 14px;
-    justify-content: flex-end;
-    /* 右寄せ */
+.is-archived {
+    opacity: 0.4;
+    filter: grayscale(1);
 }

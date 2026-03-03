@@ -12,16 +12,16 @@ export async function renderLogin() {
             <form id="login-form">
                 <div class="form-group">
                     <label>ユーザー名</label>
-                    <input type="text" id="login-username" name="username" placeholder="ユーザー名" required>
+                    <input type="text" id="login-username" name="username" placeholder="ユーザー名を入力" required>
                 </div>
                 <div class="form-group">
                     <label>パスワード</label>
-                    <input type="password" id="login-password" name="password" placeholder="パスワード" required>
+                    <input type="password" id="login-password" name="password" placeholder="パスワードを入力" required>
                 </div>
-                <button type="submit" class="btn-primary">ログイン</button>
+                <button type="submit" class="btn-main">ログイン</button>
             </form>
             <p class="auth-nav">
-                アカウントをお持ちでないですか？ 
+                アカウントをお持ちでないですか？<br>
                 <a href="#register">新規登録はこちら</a>
             </p>
         </div>
