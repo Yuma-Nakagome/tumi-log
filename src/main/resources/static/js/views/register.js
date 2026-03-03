@@ -5,7 +5,6 @@ import { register } from '../api.js';
  * 新規ユーザー登録画面のHTML構造を生成する関数
  */
 export async function renderRegister() {
-    // ユーザー名、パスワード、確認用パスワード、ログイン画面への戻るリンクを表示
     return `
         <div class="auth-box">
             <h2>新規ユーザー登録</h2>
@@ -16,16 +15,16 @@ export async function renderRegister() {
                 </div>
                 <div class="form-group">
                     <label>パスワード</label>
-                    <input type="password" id="reg-password" name="password" placeholder="パスワード（8文字以上推奨）" required>
+                    <input type="password" id="reg-password" name="password" placeholder="パスワード（8文字以上）" required>
                 </div>
                 <div class="form-group">
                     <label>パスワード（確認）</label>
-                    <input type="password" id="reg-confirm-password" name="confirmPassword" placeholder="パスワードを再入力" required>
+                    <input type="password" id="reg-confirm-password" name="confirmPassword" placeholder="もう一度入力してください" required>
                 </div>
-                <button type="submit" class="btn-primary">アカウントを作成する</button>
+                <button type="submit" class="btn-main">アカウントを作成</button>
             </form>
             <p class="auth-nav">
-                すでにアカウントをお持ちですか？ 
+                すでにアカウントをお持ちですか？<br>
                 <a href="#login">ログイン画面へ戻る</a>
             </p>
         </div>

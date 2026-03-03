@@ -2,26 +2,40 @@ import { getActivities, createActivity, updateActivity, toggleActivityArchive } 
 
 export async function renderLog(appRoot) {
     appRoot.innerHTML = `
-        <div class="activity-manager">
-            <h2>つみあげの管理</h2>
-            <p>日々の記録をつけるための「つみあげの種類」をここで登録します。</p>
+        <div class="activity-manager" style="width: 100%; box-sizing: border-box;">
+            <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">つみあげの管理</h2>
+            <p style="color: #8E8E93; font-size: 15px; margin-bottom: 20px;">積み上げる活動を定義しましょう。</p>
             
             <div class="activity-form-container">
                 <input type="hidden" id="act-id">
-                <input type="text" id="act-title" placeholder="つみあげ名 (例: 読書, ランニング)" required>
-                <input type="text" id="act-style" placeholder="アイコン (例: 📖, 🏃)" style="max-width: 150px;">
-                <button id="save-act-btn" class="btn-primary" style="width: auto; padding: 0 20px;">保存</button>              
-                <button id="cancel-act-btn" class="btn-danger" style="display:none; width: auto; padding: 0 20px; background-color:#6c757d;">キャンセル</button>
                 
-
+                <!-- 縦並びレイアウト -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- タイトル (旧アイコン欄) -->
+                    <div style="width: 100%;">
+                        <label style="display:block; font-size:12px; font-weight:600; color:#8E8E93; margin-bottom:4px; padding-left:4px;">タイトル</label>
+                        <input type="text" id="act-title" placeholder="例: 読書, プログラミング" required style="height: 50px;">
+                    </div>
+                    <!-- メモ (旧活動名欄) -->
+                    <div style="width: 100%;">
+                        <label style="display:block; font-size:12px; font-weight:600; color:#8E8E93; margin-bottom:4px; padding-left:4px;">メモ</label>
+                        <input type="text" id="act-style" placeholder="例: 📚, 💻" style="height: 50px;">
+                    </div>
+                    <!-- 保存ボタン (横幅いっぱい) -->
+                    <div class="form-actions" style="display: flex; gap: 8px; margin-top: 4px;">
+                        <button id="save-act-btn" class="btn-main" style="height: 50px; flex: 1;">保存</button>
+                        <button id="cancel-act-btn" class="btn-sub" style="display:none; height: 50px; flex: 1;">取消</button>
+                    </div>
+                </div>
             </div>
-            <div class="toggle-wrapper">
-    <span>非表示の活動も表示</span>
-    <label class="switch">
-        <input type="checkbox" id="show-archived-toggle">
-        <span class="slider"></span>
-    </label>
-</div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px; margin-bottom: 12px;">
+                <span style="font-weight: 600; font-size: 14px; color: #8E8E93;">アーカイブした活動を表示</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="show-archived-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
 
             <ul id="activity-list" class="activity-list"></ul>
         </div>
@@ -35,123 +49,100 @@ export async function renderLog(appRoot) {
     const cancelBtn = document.getElementById('cancel-act-btn');
     const archiveToggle = document.getElementById('show-archived-toggle');
 
-    // ★ ここがポイント：Javaから取ってきた全データをここに一時保存する
     let allActivities = [];
 
-    // --- 【表示だけを担当する関数】 ---
     function renderUI(activitiesToShow) {
         listEl.innerHTML = '';
         if (!activitiesToShow || activitiesToShow.length === 0) {
-            listEl.innerHTML = '<li class="activity-item">活動がありません。</li>';
+            listEl.innerHTML = '<li style="text-align:center; padding: 40px 0; color:#8E8E93; font-size:15px; list-style:none;">活動がありません。</li>';
             return;
         }
 
         activitiesToShow.forEach(act => {
+            const isArchived = act.archive || act.archived;
             const li = document.createElement('li');
-            li.className = `activity-item ${act.archive ? 'is-archived' : ''}`; // 非表示ならクラス付与
+            li.className = `activity-item ${isArchived ? 'is-archived' : ''}`;
             li.innerHTML = `
                 <div class="activity-info">
                     <span class="activity-icon">${act.displayStyle || '📝'}</span>
                     <span class="activity-name">${act.title}</span>
                 </div>
                 <div class="activity-actions">
-                    <button class="btn-edit" data-id="${act.id}" ...>編集</button>
-                    <button class="btn-danger toggle-act-btn" data-id="${act.id}" data-status="${act.archive}">
-                        ${act.archive ? '表示に戻す' : '非表示にする'}
-                    </button>
+                    <button class="btn-edit" data-id="${act.id}" data-title="${act.title}" data-style="${act.displayStyle || ''}">編集</button>
+                    <label class="toggle-switch">
+                        <input type="checkbox" class="toggle-act-checkbox" data-id="${act.id}" ${!isArchived ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
                 </div>
             `;
             listEl.appendChild(li);
         });
 
-        // ボタンイベントの設定 (renderUIの中で毎回行う)
         attachEvents();
     }
 
-    // --- 【B. フィルターしてUIに渡す関数】 ---
     function applyFilter() {
         const isShowAll = archiveToggle.checked;
-        const filtered = isShowAll ? allActivities : allActivities.filter(a => !a.archive);
+        const filtered = isShowAll ? allActivities : allActivities.filter(a => !(a.archive || a.archived));
         renderUI(filtered);
     }
 
     async function refreshList() {
         try {
-            const activities = await getActivities(true); // includeArchived=true で全てのアクティビティを取得
-            allActivities = activities; // ★ 変数に保存！
-            // 今のトグルの状態を見て表示を反映
+            const activities = await getActivities(); 
+            allActivities = activities; 
             applyFilter();
-
         } catch (error) {
-            console.error('読み込みエラー:', error);
             listEl.innerHTML = '<li class="activity-item">データの取得に失敗しました。</li>';
         }
     }
 
-    // トグルが変更された時
-    archiveToggle.onchange = () => {
-        applyFilter(); // APIは叩かず、手元のデータをフィルターするだけ
-    };
-
+    archiveToggle.onchange = () => applyFilter();
 
     saveBtn.onclick = async () => {
-        const data = { title: titleInput.value, displayStyle: styleInput.value }; // 入力値を取得
-        const id = idInput.value; // IDがあれば「更新」、なければ「新規」
-        if (!data.title) return alert('活動名は必須です'); // 空入力チェック
-
+        // title欄 (act-title) と style欄 (act-style) をそのまま使用
+        const data = { title: titleInput.value, displayStyle: styleInput.value };
+        const id = idInput.value;
+        if (!data.title) return alert('タイトルは必須です');
         try {
-            if (id) await updateActivity(id, data); // IDがあれば更新API
-            else await createActivity(data);         // なければ新規作成API
-
-            resetForm();         // フォームを綺麗にする
-            await refreshList(); // 保存が終わったのでJavaと同期してリストを新しくする
-        } catch (e) {
-            alert('保存に失敗しました');
-        }
+            if (id) await updateActivity(id, data);
+            else await createActivity(data);
+            resetForm();
+            await refreshList();
+        } catch (e) { alert('保存に失敗しました'); }
     };
 
-    cancelBtn.onclick = () => {
-        resetForm();
-    };
+    cancelBtn.onclick = () => resetForm();
 
     function resetForm() {
-        idInput.value = '';
-        titleInput.value = '';
-        styleInput.value = '';
-        saveBtn.innerText = '保存';
-        cancelBtn.style.display = 'none';
+        idInput.value = ''; titleInput.value = ''; styleInput.value = '';
+        saveBtn.innerText = '保存'; cancelBtn.style.display = 'none';
     }
 
-    // 編集・トグルボタンのイベント登録 (再描画のたびに呼ぶ)
     function attachEvents() {
-        // 編集ボタン
         document.querySelectorAll('.btn-edit').forEach(btn => {
             btn.onclick = (e) => {
-                const { id, title, style } = e.target.dataset;
+                const { id, title, style } = e.currentTarget.dataset;
                 idInput.value = id; titleInput.value = title; styleInput.value = style;
                 saveBtn.innerText = '更新'; cancelBtn.style.display = 'inline-block';
                 titleInput.focus();
             };
         });
 
-        // 非表示ボタン
-        document.querySelectorAll('.toggle-act-btn').forEach(btn => {
-            btn.onclick = async (e) => {
-                const currentStatus = e.target.dataset.status === 'true';
-                const nextStatus = !currentStatus;
-                const actionText = nextStatus ? '非表示に' : '表示に';
-                if (confirm(`この活動を${actionText}しますか？`)) {
-                    try {
-                        await toggleActivityArchive(e.target.dataset.id, nextStatus);
-                        await refreshList(); // 状態変更後はJavaと同期
-                    } catch (err) { alert('失敗しました'); }
+        document.querySelectorAll('.toggle-act-checkbox').forEach(checkbox => {
+            checkbox.onchange = async (e) => {
+                const isVisible = e.target.checked;
+                const nextArchiveStatus = !isVisible;
+                try {
+                    await toggleActivityArchive(e.target.dataset.id, nextArchiveStatus);
+                    await refreshList();
+                } catch (err) {
+                    alert('失敗しました');
+                    e.target.checked = !isVisible;
                 }
             };
         });
     }
 
-
-    // 初回読み込み
     await refreshList();
 }
-
