@@ -8,7 +8,7 @@ export async function renderRegister() {
     return `
         <div class="auth-box">
             <h2>新規ユーザー登録</h2>
-            <form id="register-form">
+            <form id="register-form" class="auth-form">
                 <div class="form-group">
                     <label>ユーザー名</label>
                     <input type="text" id="reg-username" name="username" placeholder="使いたいユーザー名" required>
