@@ -9,7 +9,7 @@ export async function renderLogin() {
     return `
         <div class="auth-box">
             <h2>ログイン</h2>
-            <form id="login-form">
+            <form id="login-form" class="auth-form">
                 <div class="form-group">
                     <label>ユーザー名</label>
                     <input type="text" id="login-username" name="username" placeholder="ユーザー名を入力" required>
