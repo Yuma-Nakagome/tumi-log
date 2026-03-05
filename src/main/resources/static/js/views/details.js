@@ -10,7 +10,7 @@ export async function renderDetails(appRoot, selectedDate) {
     appRoot.innerHTML = `
         <div class="details-container">
             <header class="details-header">
-                <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">${selectedDate} の記録</h2>
+                <h2 style="font-size: 17px; font-weight: 800; margin-bottom: 4px;">${selectedDate} の記録</h2>
             </header>
             
             <ul id="day-log-list" class="details-log-list">
